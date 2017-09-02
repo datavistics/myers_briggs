@@ -42,11 +42,11 @@ pt_sr_info_df.index.name = 'ptypes'
 for ptype in personality_types:
     sr_name = reddit.subreddit(ptype).name
 
-    for sr_info in reddit.info([sr_name]):
-        sr_info_vars = vars(sr_info)
-        ptype_row = []
-        for col in pt_sr_info_df.columns[:-1]:
-            ptype_row.append(sr_info_vars[col])
+    sr_info = next(reddit.info([sr_name]))
+    sr_info_vars = vars(sr_info)
+    ptype_row = []
+    for col in pt_sr_info_df.columns[:-1]:
+        ptype_row.append(sr_info_vars[col])
 
     gilded_count = sum(1 for i in reddit.subreddit(ptype).gilded())
     ptype_row.append(gilded_count)
@@ -58,7 +58,5 @@ df = pd.concat([pt_sr_info_df, pt_dist_df], axis=1)
 
 # Feature engineering
 df['description_length'] = df.description.apply(len)
-df['creation_date'] = pd.to_datetime(df.created_utc, unit='d')
+df['creation_date'] = pd.to_datetime(df.created_utc, unit='s')
 df['age'] = pd.Timestamp(DT.datetime.now()) - df.creation_date
-
-
